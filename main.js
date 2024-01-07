@@ -13,10 +13,15 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { Galaxy } from './objects/galaxy.js';
+import { NUM_STARS } from './config/galaxyConfig.js';
+import { Star } from './objects/star.js';
+
+
 
 let canvas, renderer, camera, scene, orbit, baseComposer, bloomComposer, overlayComposer
 
 let raycaster = new THREE.Raycaster();
+raycaster.params.Sprite = { threshold: 0.1 }; // Ajuste a sensibilidade do raycaster
 let mouse = new THREE.Vector2();
 
 function onMouseMove(event) {
@@ -28,18 +33,47 @@ function onMouseMove(event) {
     raycaster.setFromCamera(mouse, camera);
 
     // Calcular objetos que intersectam o raio do raycaster
-    let intersects = raycaster.intersectObjects(scene.children);
+    let intersects = raycaster.intersectObjects(scene.children, true);
+    console.log(`Intersected objects count: ${intersects.length}`);
 
     for (let i = 0; i < intersects.length; i++) {
-        // Verifica se o objeto intersectado é uma estrela
-        if (intersects[i].object instanceof Star) { // Substitua 'Star' pela classe ou identificador correto das suas estrelas
+        console.log(`Intersected object ${i}: `, intersects[i].object);
+        if (intersects[i].object.isStar) {
+            console.log('Uma estrela foi intersectada!');  // Log adicional
             alert('Estrela encontrada!');
-            break; // Sair do loop depois de encontrar a primeira estrela
+            break;
         }
     }
 }
 
 window.addEventListener('mousemove', onMouseMove, false);
+
+window.addEventListener('dblclick', onDoubleClick, false);
+
+function onDoubleClick(event) {
+    // Converter a posição do mouse para coordenadas normalizadas de -1 a +1
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Atualizar o raycaster com a posição do mouse
+    raycaster.setFromCamera(mouse, camera);
+
+    // Calcular a posição no espaço 3D onde o raio intersecta um plano imaginário
+    // Você pode ajustar a posição e orientação deste plano conforme necessário
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const targetPoint = new THREE.Vector3();
+    raycaster.ray.intersectPlane(plane, targetPoint);
+
+    // Adicionar uma nova estrela nessa posição
+    addStar(targetPoint);
+}
+
+function addStar(position) {
+    let star = new Star(position);
+    star.toThreeObject(scene);
+    console.log(`Nova estrela criada na posição: x=${position.x}, y=${position.y}, z=${position.z}`);
+}
+
 
 function initThree() {
 
@@ -66,6 +100,17 @@ function initThree() {
     orbit.maxPolarAngle = (Math.PI / 2) - (Math.PI / 360)
 
     initRenderPipeline()
+
+    for (let i = 0; i < NUM_STARS; i++) {
+        let x = 5;
+        let y = 20;
+        let z = 2;
+    
+        let star = new Star(new THREE.Vector3(x, y, z));
+        star.toThreeObject(scene);
+        console.log(`Star ${i} created at position: x=${x}, y=${y}, z=${z}`); // Log de diagnóstico
+
+    }
 
 }
 
@@ -136,6 +181,8 @@ function resizeRendererToDisplaySize(renderer) {
 }
 
 async function render() {
+    console.log("Rendering frame"); // Log de diagnóstico
+
 
     orbit.update()
 

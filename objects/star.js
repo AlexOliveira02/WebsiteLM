@@ -12,6 +12,7 @@ export class Star {
         this.position = position
         this.starType = this.generateStarType()
         this.obj = null
+        this.isStar = true; // Adiciona uma propriedade para identificar que isso é uma estrela
     }
 
     generateStarType() {
@@ -36,14 +37,16 @@ export class Star {
     }
 
     toThreeObject(scene) {
-        let sprite = new THREE.Sprite(materials[this.starType])
-        sprite.layers.set(BLOOM_LAYER)
+        let sprite = new THREE.Sprite(materials[this.starType]);
+        sprite.layers.set(BLOOM_LAYER);
         
-        sprite.scale.multiplyScalar(starTypes.size[this.starType])
-        sprite.position.copy(this.position)
-
-        this.obj = sprite
-
-        scene.add(sprite)
+        sprite.scale.multiplyScalar(starTypes.size[this.starType]);
+        sprite.position.copy(this.position);
+    
+        sprite.isStar = this.isStar; // Transferir a propriedade isStar para o objeto THREE.Sprite
+    
+        this.obj = sprite;
+    
+        scene.add(sprite);
     }
 }
