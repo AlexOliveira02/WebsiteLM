@@ -1,19 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const canvas = document.getElementById('starCanvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-    const starInfo = document.getElementById('starInfo');
-    const firstText = document.getElementById('firstText');
-    const fourInput = document.getElementById('fourInput');
-    const thirdTextInput = document.getElementById('thirdTextInput');
-    let currentStar = null;
-    let starCount = 0;
-    let isMouseOverStar = false;
-    let lineOpacity = 1;
-    let shouldDrawLine = false;
-    let stars = [];
-    let motivoEstrela = ''; // Variável global para armazenar o motivo
+        const canvas = document.getElementById('starCanvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        const starInfo = document.getElementById('starInfo');
+        const firstText = document.getElementById('firstText');
+        const fourInput = document.getElementById('fourInput');
+        const thirdTextInput = document.getElementById('thirdTextInput');
+        let currentStar = null;
+        let starCount = 0;
+        let isMouseOverStar = false;
+        let lineOpacity = 1;
+        let shouldDrawLine = false;
+        let stars = [];
+        let motivoEstrela = ''; // Variável global para armazenar o motivo
 
     const emocoesConhecidas = ["feliz", "triste", "empolgado", "pensativo", "alegre", "angustiado", "calmo", "eufórico"]; // Todas em minúsculas
 
@@ -43,11 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
         secondText.style.display = 'none';
         thirdText.style.display = 'block';
     }, 6000); // 6000 milissegundos = 6 segundos
-
-    // Cria 100 estrelas pelo que entendi?
-    for (let i = 0; i < 100; i++) {
-        stars.push(createStar(canvas, ctx, stars, starInfo));
-    }
 
     // Mostra informação relativo a cada estrela!
     document.addEventListener('click', function(event) {
@@ -99,13 +94,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Para remover no fim! Apenas teste - Adiciona uma estrela ao clicar 2x
-    document.addEventListener('dblclick', function(event) {
-        if (isSpaceFree(event.pageX, event.pageY, stars)) {
-            const newStar = createStar(canvas, ctx, stars, starInfo, event.pageX, event.pageY, motivoEstrela);
-            stars.push(newStar);
-            motivoEstrela = ''; // Resetar o motivo após criar a estrela
-        }
-    });
+    // document.addEventListener('dblclick', function(event) {
+    //     if (isSpaceFree(event.pageX, event.pageY, stars)) {
+    //         const newStar = createStar(canvas, ctx, stars, starInfo, event.pageX, event.pageY, motivoEstrela);
+    //         stars.push(newStar);
+    //         motivoEstrela = ''; // Resetar o motivo após criar a estrela
+    //     }
+    // });
     
 
 // ESTRELAS
@@ -198,13 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
             lineOpacity -= 0.01;
         }
     }
-    
-    //Faz a animação do DrawLines
-    function animate() {
-        requestAnimationFrame(animate);
-        drawLines(ctx, stars, currentStar);
-    }
-    animate();
 
     // Carrossel typing Effect -- Não está a funcionar!
     class TypeWriter {
