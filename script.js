@@ -1,3 +1,15 @@
+export const emocoesConhecidas = [ "happy", "excited", "positive", "amazing", "spectacular", "good", "cheered-up", "incredible", "magnificent", "comfortable",
+"optimistic", "fantastic", "radiant", "great", "excellent", "satisfied", "fulfilled", "better","intellectual", "inspired", "curious", 
+"professional", "smart", "intelligent",
+"relaxed", "calm", "crazy", "fun", "sarcastic", "funny", "hilarious","ok", "neutral", "indifferent", "normal","surprised", "amazed", "relieved",
+"proud", "strong", "confident", "cool", "determined", "motivated","cute", "adorable", "handsome", "pretty", "gorgeous", "hot", "attractive",
+"loved", "protected", "special", "welcome","blessed", "thankful", "hopeful", "lucky","bored", "lazy", "tired", "exhausted", "sleepy", "fed up",
+"lonely", "alone","sad", "heartbroken", "desolate", "disappointed", "bad", "depressed", "horrible", "stupid", "terrible", "hurt",
+"insulted", "tense", "melancholic", "incomplete", "guilty", "worse", "despised", "insecure","angry", "furious", "annoyed", "rude", 
+"jealous","stressed", "distressed", "worried", "anxious",     
+"cold", "sick", "hungry","lost", "confused","shy", "weird", "awkward", "embarrassed","thoughtful", "nostalgic",
+"human", "emotional", "old","free", "alive"];
+
 document.addEventListener('DOMContentLoaded', function() {
         const canvas = document.getElementById('starCanvas');
         canvas.width = window.innerWidth;
@@ -14,9 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let shouldDrawLine = false;
         let stars = [];
         let motivoEstrela = ''; // Variável global para armazenar o motivo
-
-    const emocoesConhecidas = ["feliz", "triste", "empolgado", "pensativo", "alegre", "angustiado", "calmo", "eufórico"]; // Todas em minúsculas
-
+         
 
     //Cores de cada emoção
     const emotionColors = {

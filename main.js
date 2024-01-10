@@ -16,6 +16,7 @@ import { Galaxy } from './objects/galaxy.js';
 import { NUM_STARS } from './config/galaxyConfig.js';
 import { Star } from './objects/star.js';
 import { gaussianRandom, spiral } from './utils.js'; // Adjust the path if necessary
+import { emocoesConhecidas } from './script.js';
 
 
 let canvas, renderer, camera, scene, orbit, baseComposer, bloomComposer, overlayComposer
@@ -66,12 +67,13 @@ function onClick(event) {
 
     if (intersects.length > 0) {
         const intersectedStar = intersects[0].object;
-
         const starId = intersectedStar.id;
         const starPosition = intersectedStar.position;
+        const starEmotion = intersectedStar.emotion; // Adiciona esta linha para pegar a 
         
-        console.log(`Estrela clicada com ID: ${starId}, coordenadas: x=${starPosition.x}, y=${starPosition.y}, z=${starPosition.z}`);
-                
+        console.log(`Estrela clicada com ID: ${starId}, coordenadas: x=${starPosition.x}, y=${starPosition.y}, z=${starPosition.z}, emoção: ${starEmotion}`);
+        starCoordinates.textContent = `Coordenadas: x=${starPosition.x.toFixed(2)}, y=${starPosition.y.toFixed(2)}, z=${starPosition.z.toFixed(2)}\nEmoção: ${starEmotion}`;
+
         // Aqui você pode adicionar a lógica para mostrar as coordenadas em sua interface
         // Por exemplo, atualizar o texto em um elemento HTML com as coordenadas da estrela
     } else {
@@ -85,9 +87,9 @@ function onClick(event) {
                 // Obter o elemento HTML do dropdown
                 const starInfo = document.getElementById('starInfo');
                 const starCoordinates = document.getElementById('starCoordinates');
-        
+
                 // Atualizar o conteúdo do dropdown
-                starCoordinates.textContent = `Coordenadas: x=${position.x}, y=${position.y}, z=${position.z}`;
+                starCoordinates.textContent = `C: x=${position.x}, y=${position.y}, z=${position.z}\nEmoção: ${starEmotion}`;
         
                 // Converter a posição da estrela para coordenadas de tela
                 const screenPosition = position.clone();
@@ -115,10 +117,12 @@ function onClick(event) {
 }
 
 function addStar(position) {
-    let star = new Star(position);
+    const randomIndex = Math.floor(Math.random() * emocoesConhecidas.length);
+    const randomEmotion = emocoesConhecidas[randomIndex];
+    let star = new Star(position, Star.nextId++, randomEmotion);
     star.toThreeObject(starGroup); 
     starsPositions.push(position.clone()); 
-    console.log(`Nova estrela criada na posição: x=${position.x}, y=${position.y}, z=${position.z}`);
+    console.log(`Nova estrela criada na posição: x=${position.x}, y=${position.y}, z=${position.z} e emoção: ${randomEmotion}`);
 }
 
 function initThree() {
