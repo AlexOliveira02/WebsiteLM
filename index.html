@@ -58,16 +58,15 @@
         <span class="txt-type" data-wait="3000" data-words='["life is hard", "I am lost, I miss someone "]'></span></h1>
         <input type="text" id="fourInput" placeholder="Write your reason here...">
     </div>
-    <div id="starInfo">
-        <p>Informações da Estrela</p>
-        <p id="emotionText">Emoção: </p>
+    <div id="starInfo" style="display: none; position: absolute; background-color: white; border: 1px solid black; padding: 10px; color: black;">
+        <p id="starCoordinates"></p>
     </div>
-    <script src="script.js"></script>
+    <script src="main.js" type="module" async defer></script>
+    <script src="script.js" type="module"></script>
     <script src="sketch.js"></script>
 
-    <!-- Adicione aqui o conteúdo do segundo código -->
     <canvas id="starCanvas" data-engine="2D"></canvas>
     <canvas id="canvas" data-engine="three.js r146"></canvas>
-    <script src="main.js" type="module" async defer></script>
+    
 </body>
 </html>

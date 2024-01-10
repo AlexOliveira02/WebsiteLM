@@ -43,14 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         secondText.style.display = 'none';
         thirdText.style.display = 'block';
     }, 6000); // 6000 milissegundos = 6 segundos
-
-    // Mostra informação relativo a cada estrela!
-    document.addEventListener('click', function(event) {
-        if (!event.target.classList.contains('star')) {
-            starInfo.style.display = 'none';
-        }
-    });
-    
+   
     // Input do 3 texto!
     thirdTextInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
@@ -75,23 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fourText.style.display = 'block'; // Mostra o 4 texto
             }
         }
-    });
-    
-    // Input do 4 texto!
-    fourInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            if (this.value.trim() === '') {
-                alert('Por favor, insere um pequeno texto para o motivo de tal emoção.');
-            } else {
-                motivoEstrela = this.value; // Armazenar o valor inserido
-                const newStar = createStar(canvas, ctx, stars, starInfo, event.pageX, event.pageY, motivoEstrela);
-                stars.push(newStar);
-                motivoEstrela = ''; // Resetar o motivo após criar a estrela
-                fourText.style.display = 'none';
-                document.getElementById('introBackground').style.display = 'none';
-            }
-        }
-    });
+    });  
     
     // Para remover no fim! Apenas teste - Adiciona uma estrela ao clicar 2x
     // document.addEventListener('dblclick', function(event) {
@@ -101,98 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     //         motivoEstrela = ''; // Resetar o motivo após criar a estrela
     //     }
     // });
-    
-
-// ESTRELAS
-    //Cria uma estrela
-    function createStar(canvas, ctx, stars, starInfo, x = Math.random() * canvas.width, y = Math.random() * canvas.height, motivo) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = `${x}px`;
-        star.style.top = `${y}px`;
-    
-        const minSize = 40;
-        const maxSize = 80;
-        const size = minSize + Math.random() * (maxSize - minSize);
-    
-        const initialSize = 100;
-        star.style.width = `${initialSize}px`;
-        star.style.height = `${initialSize}px`;
-    
-        setTimeout(() => {
-            const finalSize = Math.random() * 6 + 2;
-            star.style.width = `${finalSize}px`;
-            star.style.height = `${finalSize}px`;
-        }, 5000);
-    
-        starCount++;
-        console.log(`Número de Estrelas: ${starCount}`);
-    
-        star.addEventListener('mouseover', () => {
-            isMouseOverStar = true;
-            currentStar = star;
-            lineOpacity = 1;
-        });
-    
-        star.addEventListener('mouseout', () => {
-            isMouseOverStar = false;
-        });
-    
-        const emotions = ["Feliz", "Triste", "Empolgado", "Pensativo"];
-        const starEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-        star.setAttribute('data-emotion', starEmotion);
-        const starColor = emotionColors[starEmotion];
-        star.style.backgroundColor = starColor;
-    
-        star.addEventListener('click', function(event) {
-            currentStar = this;
-    
-            event.stopPropagation();
-            starInfo.style.display = 'block';
-            starInfo.style.left = `${event.pageX}px`;
-            starInfo.style.top = `${event.pageY}px`;
-    
-            const emotion = star.getAttribute('data-emotion');
-            starInfo.innerHTML = `Informações da Estrela:<br>Coordenada X: ${event.pageX}<br>Coordenada Y: ${event.pageY}<br>Emoção: ${emotion}<br>Motivo: ${motivo}`;
-        });
-    
-        document.body.appendChild(star);
-        return star;
-    }
-    
-    //Se estiver muito perto, não deixa criar a estrela
-    function isSpaceFree(x, y, stars, minDistance = 50) {
-        return stars.every(star => {
-            const starX = parseInt(star.style.left);
-            const starY = parseInt(star.style.top);
-            const distance = Math.sqrt(Math.pow(starX - x, 2) + Math.pow(starY - y, 2));
-            return distance >= minDistance;
-        });
-    }
-
-    //Linha de Emoção - A Funcionar! + Estético
-    function drawLines(ctx, stars, currentStar) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        if (lineOpacity > 0 && currentStar) {
-            const currentEmotion = currentStar.getAttribute('data-emotion');
-            const connectedStars = stars.filter(star => star.getAttribute('data-emotion') === currentEmotion);
-    
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${lineOpacity})`;
-            ctx.moveTo(currentStar.offsetLeft + currentStar.offsetWidth / 2, currentStar.offsetTop + currentStar.offsetHeight / 2);
-    
-            connectedStars.forEach(targetStar => {
-                ctx.lineTo(targetStar.offsetLeft + targetStar.offsetWidth / 2, targetStar.offsetTop + targetStar.offsetHeight / 2);
-                ctx.moveTo(targetStar.offsetLeft + targetStar.offsetWidth / 2, targetStar.offsetTop + targetStar.offsetHeight / 2);
-            });
-    
-            ctx.stroke();
-        }
-    
-        if (!isMouseOverStar && lineOpacity > 0) {
-            lineOpacity -= 0.01;
-        }
-    }
 
     // Carrossel typing Effect -- Não está a funcionar!
     class TypeWriter {

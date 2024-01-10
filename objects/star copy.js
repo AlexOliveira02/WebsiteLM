@@ -9,10 +9,9 @@ const materials = starTypes.color.map((color) => new THREE.SpriteMaterial({map: 
 export class Star {
     static nextId = 1; // Static variable to keep track of the next ID
 
-    constructor(position, id) {
-        this.id = id;
-        this.position = position;
-        this.coordinates = { x: position.x, y: position.y, z: position.z };
+    constructor(position) {
+        this.id = Star.nextId++; // Atribuir um ID único e incrementar
+        this.position = position
         this.starType = this.generateStarType()
         this.obj = null
     }

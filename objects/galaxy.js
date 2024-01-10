@@ -5,26 +5,30 @@ import { gaussianRandom, spiral } from '../utils.js';
 import { Haze } from './haze.js';
 
 export class Galaxy {
-
     constructor(scene) {
+        this.scene = scene;
+        this.starGroup = new THREE.Group(); 
+        this.stars = this.generateObject(NUM_STARS, (pos) => new Star(pos));
+        this.haze = this.generateObject(NUM_STARS * HAZE_RATIO, (pos) => new Haze(pos));
 
-        this.scene = scene
+        this.stars.forEach((star) => {
+            star.toThreeObject(this.starGroup);
+        });
+        this.haze.forEach((haze) => {
+            haze.toThreeObject(scene);
+        });
 
-        this.stars = this.generateObject(NUM_STARS, (pos) => new Star(pos))
-        this.haze = this.generateObject(NUM_STARS * HAZE_RATIO, (pos) => new Haze(pos))
-
-        this.stars.forEach((star) => star.toThreeObject(scene))
-        this.haze.forEach((haze) => haze.toThreeObject(scene))
+        this.scene.add(this.starGroup); 
     }
 
     updateScale(camera) {
         this.stars.forEach((star) => {
-            star.updateScale(camera)
-        })
+            star.updateScale(camera);
+        });
     
         this.haze.forEach((haze) => {
-            haze.updateScale(camera)
-        })
+            haze.updateScale(camera);
+        });
     }
 
     generateObject(numStars, generator) {
@@ -51,5 +55,5 @@ export class Galaxy {
         }
 
         return objects
-    }
+    } 
 }

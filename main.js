@@ -15,40 +15,18 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { Galaxy } from './objects/galaxy.js';
 import { NUM_STARS } from './config/galaxyConfig.js';
 import { Star } from './objects/star.js';
-
+import { gaussianRandom, spiral } from './utils.js'; // Adjust the path if necessary
 
 
 let canvas, renderer, camera, scene, orbit, baseComposer, bloomComposer, overlayComposer
 
+// Declarações globais
 let raycaster = new THREE.Raycaster();
-raycaster.params.Sprite = { threshold: 0.1 }; // Ajuste a sensibilidade do raycaster
+raycaster.params.Sprite = { threshold: 0.1 };
 let mouse = new THREE.Vector2();
+let starGroup; // Declaração global de starGroup
+let starsPositions = [];
 
-function onMouseMove(event) {
-    // Calcular a posição do mouse em coordenadas normalizadas (-1 a +1) para ambos os eixos
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // Atualizar o raycaster com a posição do mouse
-    raycaster.setFromCamera(mouse, camera);
-
-    // Calcular objetos que intersectam o raio do raycaster
-    let intersects = raycaster.intersectObjects(scene.children, true);
-    console.log(`Intersected objects count: ${intersects.length}`);
-
-    for (let i = 0; i < intersects.length; i++) {
-        console.log(`Intersected object ${i}: `, intersects[i].object);
-        if (intersects[i].object.isStar) {
-            console.log('Uma estrela foi intersectada!');  // Log adicional
-            alert('Estrela encontrada!');
-            break;
-        }
-    }
-}
-
-window.addEventListener('mousemove', onMouseMove, false);
-
-window.addEventListener('dblclick', onDoubleClick, false);
 
 function onDoubleClick(event) {
     // Converter a posição do mouse para coordenadas normalizadas de -1 a +1
@@ -68,21 +46,95 @@ function onDoubleClick(event) {
     addStar(targetPoint);
 }
 
-function addStar(position) {
-    let star = new Star(position);
-    star.toThreeObject(scene);
-    console.log(`Nova estrela criada na posição: x=${position.x}, y=${position.y}, z=${position.z}`);
+function onClick(event) {
+    const starInfo = document.getElementById('starInfo'); 
+    const starCoordinates = document.getElementById('starCoordinates');
+
+    starCoordinates.textContent = ``;
+
+    starInfo.style.display = 'none';
+
+    // Transformar as coordenadas do clique do mouse em coordenadas normalizadas do espaço de visualização (-1 a +1)
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Atualizar o raycaster com a posição do mouse
+    raycaster.setFromCamera(mouse, camera);
+
+    // Calcular objetos que intersectam o raio do clique do mouse
+    const intersects = raycaster.intersectObjects(galaxy.starGroup.children, true);
+
+    if (intersects.length > 0) {
+        const intersectedStar = intersects[0].object;
+
+        const starId = intersectedStar.id;
+        const starPosition = intersectedStar.position;
+        
+        console.log(`Estrela clicada com ID: ${starId}, coordenadas: x=${starPosition.x}, y=${starPosition.y}, z=${starPosition.z}`);
+                
+        // Aqui você pode adicionar a lógica para mostrar as coordenadas em sua interface
+        // Por exemplo, atualizar o texto em um elemento HTML com as coordenadas da estrela
+    } else {
+        // Convertendo a posição do mouse para coordenadas do espaço do mundo
+        const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+        vector.unproject(camera);
+
+        // Verificar se a posição do clique está próxima de alguma estrela conhecida
+        for (const position of starsPositions) {
+            if (vector.distanceTo(position) < 20) {
+                // Obter o elemento HTML do dropdown
+                const starInfo = document.getElementById('starInfo');
+                const starCoordinates = document.getElementById('starCoordinates');
+        
+                // Atualizar o conteúdo do dropdown
+                starCoordinates.textContent = `Coordenadas: x=${position.x}, y=${position.y}, z=${position.z}`;
+        
+                // Converter a posição da estrela para coordenadas de tela
+                const screenPosition = position.clone();
+                screenPosition.project(camera);
+        
+                // Converter as coordenadas normalizadas (-1 a +1) para coordenadas do viewport
+                const x = (screenPosition.x *  .5 + .5) * canvas.clientWidth;
+                const y = (screenPosition.y * -.5 + .5) * canvas.clientHeight;
+        
+                // Posicionar e mostrar o dropdown
+                starInfo.style.left = `${x}px`;
+                starInfo.style.top = `${y}px`;
+                starInfo.style.display = 'block';
+        
+                return;
+            }
+        }
+
+        const starInfo = document.getElementById('starInfo');
+        if (starInfo) {
+            starInfo.style.display = 'none';
+        }
+        console.log("Nenhuma estrela foi clicada");
+    }
 }
 
+function addStar(position) {
+    let star = new Star(position);
+    star.toThreeObject(starGroup); 
+    starsPositions.push(position.clone()); 
+    console.log(`Nova estrela criada na posição: x=${position.x}, y=${position.y}, z=${position.z}`);
+}
 
 function initThree() {
 
     // grab canvas
     canvas = document.querySelector('#canvas');
 
-    // scene
+    // Inicializando a cena
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0xEBE2DB, 0.00003);
+
+    // Agora adicionamos o starGroup depois de a cena ter sido criada
+    starGroup = new THREE.Group();
+    scene.add(starGroup);
+
+
 
     // camera
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 5000000 );
@@ -102,15 +154,38 @@ function initThree() {
     initRenderPipeline()
 
     for (let i = 0; i < NUM_STARS; i++) {
-        let x = 5;
-        let y = 20;
-        let z = 2;
-    
-        let star = new Star(new THREE.Vector3(x, y, z));
-        star.toThreeObject(scene);
-        console.log(`Star ${i} created at position: x=${x}, y=${y}, z=${z}`); // Log de diagnóstico
+        // Generate a random position for each star
+        let x = gaussianRandom(/* mean, stdev */);
+        let y = gaussianRandom(/* mean, stdev */);
+        let z = gaussianRandom(/* mean, stdev for the z-axis if different */);
 
+        // Apply the spiral transformation to the position
+        let position = spiral(x, y, z, /* offset, possibly based on i or other factors */);
+
+        let star = new Star(position);
+        star.toThreeObject(scene);
+        console.log(`Star ID: ${star.id}, Position: x=${star.position.x}, y=${star.position.y}, z=${star.position.z}`);
     }
+
+        fourInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            if (this.value.trim() === '') {
+                alert('Por favor, insere um pequeno texto para o motivo de tal emoção.');
+            } else {
+                fourText.style.display = 'none';
+                document.getElementById('introBackground').style.display = 'none';
+    
+                // Criar uma nova estrela em uma posição aleatória
+                let randomPosition = new THREE.Vector3(
+                    (Math.random() - 0.5) * 1000,
+                    (Math.random() - 0.5) * 1000,
+                    (Math.random() - 0.5) * 1000
+                );
+    
+                addStar(randomPosition);
+            }
+        }
+    }); 
 
 }
 
@@ -181,9 +256,6 @@ function resizeRendererToDisplaySize(renderer) {
 }
 
 async function render() {
-    console.log("Rendering frame"); // Log de diagnóstico
-
-
     orbit.update()
 
     // fix buffer size
@@ -224,6 +296,8 @@ function renderPipeline() {
 }
 
 initThree()
+window.addEventListener('click', onClick, false);
+window.addEventListener('dblclick', onDoubleClick, false);
 let axes = new THREE.AxesHelper(5.0)
 scene.add(axes)
 
