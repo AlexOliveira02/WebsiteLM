@@ -1,0 +1,15 @@
+{
+  "name": "websitelm-2d",
+  "version": "1.0.0",
+  "description": "### University of Porto, Faculty of Engineering",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
